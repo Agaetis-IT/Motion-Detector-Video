@@ -2,7 +2,6 @@
 import argparse
 import datetime
 import imutils
-from utils.app_utils import WebcamVideoStream
 import time
 import cv2
 
@@ -22,14 +21,15 @@ ap.add_argument("-l", "--display-level", type=int, default=0,
                 help="Display level (0: no display)")
 args = vars(ap.parse_args())
 
-# Get input video 
+# Get input video
 print("Start video capture")
 noVideoError = True
 try:
         vs = cv2.VideoCapture("inputs/{}".format(args["input_video"]))
 except IOError:
     print('An error occured trying to read the video file.')
-    noVideoError = False    
+    noVideoError = False
+
 time.sleep(2.0)
 
 length = int(vs.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -68,7 +68,8 @@ while noVideoError & vs.isOpened():
         nReadFrames += 1
         if ((nReadFrames / length) * 100) % 5 == 0:
                 print("{}% video treated ({} frames / {})".format(
-                        int((nReadFrames / length) * 100), nReadFrames, length))
+                        int((nReadFrames / length) * 100),
+                        nReadFrames, length))
 
         # if the frame could not be grabbed, there is an error: stop program
         if frame_dry is None:
@@ -114,11 +115,13 @@ while noVideoError & vs.isOpened():
                         print("Motion detected: Event #{}".format(
                                 detectionNumber))
                         tStartEvent = time.time()
-                        out = cv2.VideoWriter('outputs/{}.{}'.format(
-                                detectionNumber, args['output_codec']),
-                                              fourcc, vs.get(cv2.CAP_PROP_FPS),
-                                              (int(vs.get(cv2.CAP_PROP_FRAME_WIDTH)),
-                                               int(vs.get(cv2.CAP_PROP_FRAME_HEIGHT))))
+                        out = cv2.VideoWriter(
+                                'outputs/{}.{}'.format(
+                                        detectionNumber,
+                                        args['output_codec']
+                                ), fourcc, vs.get(cv2.CAP_PROP_FPS),
+                                (int(vs.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                                 int(vs.get(cv2.CAP_PROP_FRAME_HEIGHT))))
                         record = True
                 tLastDetection = time.time()
 
@@ -134,7 +137,8 @@ while noVideoError & vs.isOpened():
         # draw the text and timestamp on the frame
         cv2.putText(frame, "Room Status: {}".format(text), (10, 20),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-        cv2.putText(frame, "Contour area: {}K".format(int(sumContours/100)), (frame.shape[1]-180, 20),
+        cv2.putText(frame, "Contour area: {}K".format(int(sumContours/100)),
+                    (frame.shape[1]-180, 20),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
         cv2.putText(frame, datetime.datetime.now().strftime(
                 "%A %d %B %Y %I:%M:%S%p"), (10, frame.shape[0] - 10),
@@ -167,4 +171,5 @@ while noVideoError & vs.isOpened():
 cv2.destroyAllWindows()
 
 tEnd = time.time()
-print("Video processed in {} minutes and {} seconds".format(int((tEnd-tStart)//60),int((tEnd-tStart)%60)))
+print("Video processed in {} minutes and {} seconds".format(
+        int((tEnd-tStart)//60), int((tEnd-tStart) % 60)))
